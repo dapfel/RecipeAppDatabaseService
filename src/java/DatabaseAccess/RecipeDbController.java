@@ -170,7 +170,6 @@ public class RecipeDbController {
         ArrayList<Recipe> results = new ArrayList<>();
         
         resultList = entityManager.find(Userprofiles.class, email).getRecipesList();
-        System.out.println(resultList.get(0).getAuthor());
         for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);
             results.add(convertToRecipe(recipe));
@@ -231,6 +230,9 @@ public class RecipeDbController {
             cuisines.add(new Usercuisines(user.getEmail(), cuisine));
         }
         userP.setUsercuisinesList(cuisines);
+        
+        ArrayList<Recipes> recipesList = new ArrayList<>();
+        userP.setRecipesList(recipesList);
         
         return userP;
     }
