@@ -168,8 +168,8 @@ public class RecipeDbController {
     public ArrayList<Recipe> getUsersRecipes(String email) {
         List<Recipes> resultList;
         ArrayList<Recipe> results = new ArrayList<>();
-        
-        resultList = entityManager.find(Userprofiles.class, email).getRecipesList();
+        Userprofiles user = entityManager.find(Userprofiles.class, email);
+        resultList = user.getRecipesList();
         for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);
             results.add(convertToRecipe(recipe));
