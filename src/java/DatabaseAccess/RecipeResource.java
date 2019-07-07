@@ -52,6 +52,13 @@ public class RecipeResource {
        return Response.ok(results).build();
     }
     
+    @GET
+    @Path("getUsersRecipes/{email}")
+    public Response getUsersRecipes(@PathParam("email") String email) {
+        RecipeList results = new RecipeList(recipeDB.getUsersRecipes(email));
+        return Response.ok(results).build();
+    }
+    
     @POST
     @Path("addComment/{recipeID}")
     public Response addComment(@PathParam("recipeID") int recipeID, Comment comment) {

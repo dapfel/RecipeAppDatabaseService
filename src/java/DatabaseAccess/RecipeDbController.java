@@ -165,6 +165,20 @@ public class RecipeDbController {
         return results;
     }
     
+    public ArrayList<Recipe> getUsersRecipes(String email) {
+        List<Recipes> resultList;
+        ArrayList<Recipe> results = new ArrayList<>();
+        
+        resultList = entityManager.find(Userprofiles.class, email).getRecipesList();
+        System.out.println(resultList.get(0).getAuthor());
+        for (int i = 0; i < resultList.size(); i++) {
+            Recipes recipe = resultList.get(i);
+            results.add(convertToRecipe(recipe));
+        }
+        
+        return results;
+    }  
+    
     /**
      * convert a Userprofiles DB entity object into a UserProfile object
      */
