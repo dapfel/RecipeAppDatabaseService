@@ -155,7 +155,7 @@ public class RecipeDbController {
         searchRecipes.setParameter("skilllevel", skill);
         searchRecipes.setParameter("cuisine", cuisine);
         searchRecipes.setParameter("type", type);
-        searchRecipes.setParameter("author", author);
+        searchRecipes.setParameter("author", entityManager.find(Userprofiles.class, author));
         resultList = searchRecipes.getResultList();
         for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);
