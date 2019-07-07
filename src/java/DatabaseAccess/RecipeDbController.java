@@ -3,23 +3,20 @@ package DatabaseAccess;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 import DatabaseAccess.UserProfile.skillLevel;
 import DatabaseAccess.Recipe.recipeType;
 import DatabaseEntityClasses.*;
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
+import javax.persistence.Query;
 
 public class RecipeDbController {
     
     private final EntityManager entityManager;
-    private TypedQuery searchRecipes;
 
     public RecipeDbController() {
        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("RecipeAppDatabaseServicePU");
        entityManager = entityManagerFactory.createEntityManager();
-       searchRecipes = entityManager.createNamedQuery("Recipes.searchRecipes", Recipes.class);
     }
     
     public UserProfile validateSignIn(String email, String password) {
@@ -149,13 +146,34 @@ public class RecipeDbController {
     }
     
     public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author) {
+        String sqlString = "SELECT DISTINCT * FROM Recipes NATURAL JOIN Recipecuisines";
+        
+        if (!skill.equals("null") || !cuisine.equals("null") || !type.equals("null") || !author.equals("null"))
+            sqlString += " WHERE";
+       
+        if (!skill.equals("null")) {
+            sqlString += " skilllevel = '" + skill + "'";
+        }
+        if (!cuisine.equals("null")) {
+            if (!skill.equals("null"))
+                sqlString += " AND";
+            sqlString += " cuisine = '" + cuisine +"'";
+        }
+        if (!type.equals("null")) {
+            if (!cuisine.equals("null") || !skill.equals("null"))
+                sqlString += " AND";
+            sqlString += " type = '" + type + "'";
+        }
+        if (!author.equals("null")) {
+            if (!type.equals("null") || !cuisine.equals("null") || !skill.equals("null"))
+                sqlString += " AND";
+            sqlString += " author = '" + author + "'";
+        }
+        
+        Query searchRecipes = entityManager.createNativeQuery(sqlString, Recipes.class);
+                
         List<Recipes> resultList;
         ArrayList<Recipe> results = new ArrayList<>();
-        
-        searchRecipes.setParameter("skilllevel", skill);
-        searchRecipes.setParameter("cuisine", cuisine);
-        searchRecipes.setParameter("type", type);
-        searchRecipes.setParameter("author", entityManager.find(Userprofiles.class, author));
         resultList = searchRecipes.getResultList();
         for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);

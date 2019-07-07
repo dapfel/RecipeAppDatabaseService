@@ -39,9 +39,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Recipes.findByName", query = "SELECT r FROM Recipes r WHERE r.name = :name")
     , @NamedQuery(name = "Recipes.findByType", query = "SELECT r FROM Recipes r WHERE r.type = :type")
     , @NamedQuery(name = "Recipes.findBySkilllevel", query = "SELECT r FROM Recipes r WHERE r.skilllevel = :skilllevel")
-    , @NamedQuery(name = "Recipes.findByReleasedate", query = "SELECT r FROM Recipes r WHERE r.releasedate = :releasedate")
-    , @NamedQuery(name = "Recipes.searchRecipes", query = "SELECT DISTINCT r FROM Recipes r INNER JOIN r.recipecuisinesList a WHERE r.skilllevel = :skilllevel "
-                  + "AND r.author = :author AND r.type = :type AND a.recipecuisinesPK.cuisine = :cuisine")})
+    , @NamedQuery(name = "Recipes.findByReleasedate", query = "SELECT r FROM Recipes r WHERE r.releasedate = :releasedate")})
 public class Recipes implements Serializable {
 
     private static final long serialVersionUID = 1L;
