@@ -26,6 +26,9 @@ public class UserProfile implements Serializable {
     private ArrayList<String> followerOf; // emails of people the user follows
 
     public UserProfile() {
+        followers = new ArrayList<>();
+        followerOf = new ArrayList<>();
+        cuisines = new ArrayList<>();
     }
     
     public UserProfile(String email, String firstName, String lastName, ArrayList<String> cuisines, skillLevel cookingSkills, String country, ArrayList<String> followers, ArrayList<String> followerOf) {
@@ -57,10 +60,6 @@ public class UserProfile implements Serializable {
 
     public skillLevel getCookingSkills() {
         return cookingSkills;
-    }
-
-    public ArrayList<String> getCuisine() {
-        return cuisines;
     }
 
     public String getCountry() {
