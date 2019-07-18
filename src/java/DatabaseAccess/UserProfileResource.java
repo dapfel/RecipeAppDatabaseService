@@ -1,8 +1,7 @@
 
 package DatabaseAccess;
 
-import java.net.URI;
-import javax.ejb.Stateless;
+import com.google.gson.Gson;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -11,23 +10,19 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  * REST Web Service
  *
  * @author dapfe
  */
-@Path("/userProfile")
-@Produces(MediaType.APPLICATION_XML)
-@Consumes(MediaType.APPLICATION_XML)
+@Path("userProfile")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class UserProfileResource {
 
-    @Context
-    private UriInfo context;
     private RecipeDbController recipeDB;
 
     public UserProfileResource() {
@@ -36,43 +31,60 @@ public class UserProfileResource {
 
     @GET
     @Path("signIn/{email}/{password}")
-    public Response validateSignIn(@PathParam("email") String email, @PathParam("password") String password) {
-       return Response.ok(recipeDB.validateSignIn(email, password)).build();
+    public String validateSignIn(@PathParam("email") String email, @PathParam("password") String password) {
+       return new Gson().toJson(recipeDB.validateSignIn(email, password));
     }
     
     @POST
     @Path("add/{password}")
-    public Response addUser(UserProfile user, @PathParam("password") String password) {
+    public String addUser(String userJson, @PathParam("password") String password) {
+       UserProfile user = new Gson().fromJson(userJson, UserProfile.class);
        recipeDB.addUser(user, password);
-       URI uri = context.getAbsolutePathBuilder().path(user.getEmail()).build();
-       return Response.created(uri).build();
+       return new Gson().toJson(new TextMessage("added " + user.getEmail()));
     }
 
-    @DELETE
-    @Path("{email}")
-    public Response deleteUser(@PathParam("email") String email) {
+    @GET
+    @Path("delete/{email}")
+    public String deleteUser(@PathParam("email") String email) {
         recipeDB.deleteUser(email);
-        return Response.noContent().build();
+        return new Gson().toJson(new TextMessage("deleted " + email));
     }
     
     @GET
-    @Path("{email}")
-    public Response getUser(@PathParam("email") String email) {
-        return Response.ok(recipeDB.getUser(email)).build();
+    @Path("getUser/{email}")
+    public String getUser(@PathParam("email") String email) {
+        return new Gson().toJson(recipeDB.getUser(email));
     }
     
     @GET
-    @Path("{userEmail}/{followerEmail}")
-    public Response addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
+    @Path("addFollower/{userEmail}/{followerEmail}")
+    public String addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
         recipeDB.addFollower(userEmail, followerEmail);
-               URI uri = context.getAbsolutePathBuilder().path(userEmail).build();
-        return Response.created(uri).build();
+        return new Gson().toJson(new TextMessage("added follower " + followerEmail + " for " + userEmail));
     }
     
-    @DELETE
-    @Path("{userEmail}/{followerEmail}")
-    public Response deleteFollower(@PathParam("userEmail") String userEmail, @PathParam("followerEmail") String followerEmail) {
+    @GET
+    @Path("deleteFollower/{userEmail}/{followerEmail}")
+    public String deleteFollower(@PathParam("userEmail") String userEmail, @PathParam("followerEmail") String followerEmail) {
         recipeDB.deleteFollower(userEmail, followerEmail);
-        return Response.noContent().build();
+        return new Gson().toJson(new TextMessage("deleted follower " + followerEmail + " for " + userEmail));
+    }
+    
+    class TextMessage {
+        private String message;
+
+        public TextMessage(String message) {
+            this.message = message;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        
     }
 }

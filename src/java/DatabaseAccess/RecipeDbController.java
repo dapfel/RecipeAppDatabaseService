@@ -79,6 +79,15 @@ public class RecipeDbController {
     private void addRecipeData(Recipe recipe, int recipeID) {
         
         Recipes rec = entityManager.find(Recipes.class, recipeID);
+        
+        int i =1;
+        for (byte[] picture : recipe.getImages()) {
+            RecipepicturesPK picPK = new RecipepicturesPK(recipeID, i);
+            Recipepictures pic = new Recipepictures(picPK);
+            pic.setPicture(picture);
+            rec.getRecipepicturesList().add(pic);
+            i++;
+        }
          
         for (String cuisine : recipe.getCuisines()) {
             RecipecuisinesPK cuisPK = new RecipecuisinesPK(recipeID, cuisine);
@@ -86,7 +95,7 @@ public class RecipeDbController {
             rec.getRecipecuisinesList().add(cuis);
         }
         
-        int i = 1;
+        i = 1;
         for (String instruction : recipe.getInstructions()) {
             RecipeinstructionsPK instrucPK = new RecipeinstructionsPK(recipeID ,i);
             Recipeinstructions instruc = new Recipeinstructions(instrucPK);
@@ -264,7 +273,6 @@ public class RecipeDbController {
         recipe.setName(recipes.getName());
         recipe.setReleaseDate(recipes.getReleasedate());
         recipe.setAuthor(recipes.getAuthor().getEmail());
-        
         // convert skill level string to skillLevel enum type
         skillLevel skill = skillLevel.valueOf(recipes.getSkilllevel());
         recipe.setSkillLevel(skill);
