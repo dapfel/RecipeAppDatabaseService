@@ -31,13 +31,16 @@ public class RecipeResource {
     public String addRecipe(String recipeJson) {
        Recipe recipe = new Gson().fromJson(recipeJson, Recipe.class);
        recipeDB.addRecipe(recipe);
+       recipeDB.close();
        return new Gson().toJson(new TextMessage("added recipe " + recipe.getName()));
     }
     
     @GET
     @Path("getRecipe/{recipeID}")
     public String getRecipe(@PathParam("recipeID") int recipeID) {
-        return new Gson().toJson(recipeDB.getRecipe(recipeID));
+        String recipeJson = new Gson().toJson(recipeDB.getRecipe(recipeID));
+        recipeDB.close();
+        return recipeJson;
     }
     
     @GET
@@ -45,6 +48,7 @@ public class RecipeResource {
     public String searchRecipes(@PathParam("skill") String skill, @PathParam("cuisine") String cuisine,
                                   @PathParam("type") String type, @PathParam("author") String author) {
        RecipeList results = new RecipeList(recipeDB.searchRecipes(skill, cuisine, type, author));
+       recipeDB.close();
        return new Gson().toJson(results);
     }
     
@@ -52,6 +56,7 @@ public class RecipeResource {
     @Path("getUsersRecipes/{email}")
     public String getUsersRecipes(@PathParam("email") String email) {
         RecipeList results = new RecipeList(recipeDB.getUsersRecipes(email));
+        recipeDB.close();
         return new Gson().toJson(results);
     }
     
@@ -60,6 +65,7 @@ public class RecipeResource {
     public String addComment(@PathParam("recipeID") int recipeID, String commentJson) {
        Comment comment = new Gson().fromJson(commentJson, Comment.class);
        recipeDB.addComment(recipeID, comment);
+       recipeDB.close();
        return new Gson().toJson(new TextMessage("added comment to recipe " + recipeID));
     }
     
@@ -68,21 +74,29 @@ public class RecipeResource {
     public String addPicture(@PathParam("recipeID") int recipeID, String pictureJson) {
        byte[] picture = new Gson().fromJson(pictureJson, byte[].class);
        recipeDB.addPicture(recipeID, picture);
+       recipeDB.close();
        return new Gson().toJson(new TextMessage("picture added to recipe " + recipeID));
     }
     
     @GET
     @Path("getComments/{recipeID}")
     public String getComments(@PathParam("recipeID") int recipeID) {
-        return new Gson().toJson(recipeDB.getComments(recipeID));
+        String commentsJson = new Gson().toJson(recipeDB.getComments(recipeID));
+        recipeDB.close();
+        return commentsJson;
     }
     
     @GET
     @Path("getPictures/{recipeID}")
     public String getPictures(@PathParam("recipeID") int recipeID) {
-        return new Gson().toJson(recipeDB.getPictures(recipeID));
+        String picturesJson = new Gson().toJson(recipeDB.getPictures(recipeID));
+        recipeDB.close();
+        return picturesJson;
     }
     
+    /**
+     * hold text response from server to app
+     */
     class TextMessage {
         private String message;
 

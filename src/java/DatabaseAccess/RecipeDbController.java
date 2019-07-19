@@ -12,10 +12,11 @@ import javax.persistence.Query;
 
 public class RecipeDbController {
     
+    EntityManagerFactory entityManagerFactory;
     private final EntityManager entityManager;
 
     public RecipeDbController() {
-       EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("RecipeAppDatabaseServicePU");
+       entityManagerFactory = Persistence.createEntityManagerFactory("RecipeAppDatabaseServicePU");
        entityManager = entityManagerFactory.createEntityManager();
     }
     
@@ -204,6 +205,11 @@ public class RecipeDbController {
         
         return results;
     }  
+    
+    public void close() {
+        entityManager.close();
+        entityManagerFactory.close();
+    }
     
     /**
      * convert a Userprofiles DB entity object into a UserProfile object
