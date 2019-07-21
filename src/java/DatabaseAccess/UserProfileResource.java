@@ -38,17 +38,16 @@ public class UserProfileResource {
     @Path("add/{password}")
     public String addUser(String userJson, @PathParam("password") String password) {
        UserProfile user = new Gson().fromJson(userJson, UserProfile.class);
-       recipeDB.addUser(user, password);
-       recipeDB.close();
+       try {
+           recipeDB.addUser(user, password);
+       }
+       catch (Exception e) {
+           return new Gson().toJson(null);
+       }
+       finally {
+           recipeDB.close();
+       }
        return new Gson().toJson(new TextMessage("added " + user.getEmail()));
-    }
-
-    @GET
-    @Path("delete/{email}")
-    public String deleteUser(@PathParam("email") String email) {
-        recipeDB.deleteUser(email);
-        recipeDB.close();
-        return new Gson().toJson(new TextMessage("deleted " + email));
     }
     
     @GET
@@ -62,16 +61,30 @@ public class UserProfileResource {
     @GET
     @Path("addFollower/{userEmail}/{followerEmail}")
     public String addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
-        recipeDB.addFollower(userEmail, followerEmail);
-        recipeDB.close();
+        try {
+            recipeDB.addFollower(userEmail, followerEmail);
+        }
+        catch (Exception e) {
+            return new Gson().toJson(null);
+        }
+        finally {
+            recipeDB.close();
+        }
         return new Gson().toJson(new TextMessage("added follower " + followerEmail + " for " + userEmail));
     }
     
     @GET
     @Path("deleteFollower/{userEmail}/{followerEmail}")
     public String deleteFollower(@PathParam("userEmail") String userEmail, @PathParam("followerEmail") String followerEmail) {
-        recipeDB.deleteFollower(userEmail, followerEmail);
-        recipeDB.close();
+        try {
+            recipeDB.deleteFollower(userEmail, followerEmail);
+        }
+        catch (Exception e) {
+            return new Gson().toJson(null);
+        }
+        finally {
+            recipeDB.close();
+        }
         return new Gson().toJson(new TextMessage("deleted follower " + followerEmail + " for " + userEmail));
     }
     

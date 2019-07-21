@@ -6,6 +6,7 @@ import javax.persistence.Persistence;
 import DatabaseAccess.UserProfile.skillLevel;
 import DatabaseAccess.Recipe.recipeType;
 import DatabaseEntityClasses.*;
+import org.eclipse.persistence.exceptions.DatabaseException;
 import java.util.List;
 import java.util.ArrayList;
 import javax.persistence.Query;
@@ -22,119 +23,147 @@ public class RecipeDbController {
     
     public UserProfile validateSignIn(String email, String password) {
         Userprofiles profile = entityManager.find(Userprofiles.class, email);
+        if (profile == null) // no such email exists
+            return null;
         if (profile.getPassword().equals(password))
            return convertToUserProfile(profile);
-        else
+        else // wrong password
             return null;
     }
     
-    public void addUser(UserProfile user, String password) {
+    public void addUser(UserProfile user, String password) throws Exception {
         Userprofiles userP = convertToUserprofilesEntity(user, password);
         
-        entityManager.getTransaction().begin();       
-        entityManager.persist(userP);
-        entityManager.getTransaction().commit();
-    }
-    
-    public void deleteUser(String email) {
-       Userprofiles user = entityManager.find(Userprofiles.class, email);
-      
-       entityManager.getTransaction().begin();
-       entityManager.remove(user);
-       entityManager.getTransaction().commit();
+        try {
+            entityManager.getTransaction().begin();       
+            entityManager.persist(userP);
+            entityManager.getTransaction().commit();
+        }
+        catch (Exception e) {
+            throw e;
+        }
     }
     
     public UserProfile getUser(String email) {
         Userprofiles user = entityManager.find(Userprofiles.class, email);
-        return convertToUserProfile(user);
+        if (user == null) // no such email exists
+            return null;
+        else
+           return convertToUserProfile(user);      
     }
     
-    public void addFollower(String userEmail, String followerEmail) {
-       Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
-       Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
-       
-       entityManager.getTransaction().begin();
-       user.getFollowers().add(follower);
-       entityManager.getTransaction().commit();
-    }
-    
-    public void deleteFollower(String userEmail, String followerEmail) {
-       Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
-       Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
-       
-       entityManager.getTransaction().begin();
-       user.getFollowers().remove(follower);
-       entityManager.getTransaction().commit();
-    }
-    
-    public void addRecipe(Recipe recipe) {
-        Recipes recipes = convertToRecipesEntity(recipe);
-        
-        entityManager.getTransaction().begin();       
-        entityManager.persist(recipes);
-        entityManager.flush();
-        addRecipeData(recipe, recipes.getRecipeid());
+    public void addFollower(String userEmail, String followerEmail)throws Exception {
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
+        if (user == null || follower == null) 
+            throw new Exception();
+
+        entityManager.getTransaction().begin();
+        user.getFollowers().add(follower);
         entityManager.getTransaction().commit();
     }
     
-    private void addRecipeData(Recipe recipe, int recipeID) {
+    public void deleteFollower(String userEmail, String followerEmail) throws Exception {
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
+        if (user == null || follower == null)
+            throw new Exception();
+       
+       entityManager.getTransaction().begin();
+       user.getFollowers().remove(follower);
+       follower.getFollowerOf().remove(user);
+       entityManager.getTransaction().commit();
+    }
+    
+    public void addRecipe(Recipe recipe) throws Exception {
+        Recipes recipes = convertToRecipesEntity(recipe);
         
-        Recipes rec = entityManager.find(Recipes.class, recipeID);
-        
-        int i =1;
-        for (byte[] picture : recipe.getImages()) {
-            RecipepicturesPK picPK = new RecipepicturesPK(recipeID, i);
-            Recipepictures pic = new Recipepictures(picPK);
-            pic.setPicture(picture);
-            rec.getRecipepicturesList().add(pic);
-            i++;
+        try {
+            entityManager.getTransaction().begin();       
+            entityManager.persist(recipes);
+            entityManager.flush();
+            addRecipeData(recipe, recipes.getRecipeid());
+            entityManager.getTransaction().commit();
         }
-         
-        for (String cuisine : recipe.getCuisines()) {
-            RecipecuisinesPK cuisPK = new RecipecuisinesPK(recipeID, cuisine);
-            Recipecuisines cuis = new Recipecuisines(cuisPK);
-            rec.getRecipecuisinesList().add(cuis);
-        }
-        
-        i = 1;
-        for (String instruction : recipe.getInstructions()) {
-            RecipeinstructionsPK instrucPK = new RecipeinstructionsPK(recipeID ,i);
-            Recipeinstructions instruc = new Recipeinstructions(instrucPK);
-            instruc.setInstruction(instruction);
-            rec.getRecipeinstructionsList().add(instruc);
-            i++;
-        }
-        
-        for (String ingredient : recipe.getIngredients().keySet()) {
-            RecipeingredientsPK ingredPK = new RecipeingredientsPK(recipeID, ingredient);
-            Recipeingredients ingred = new Recipeingredients(ingredPK);
-            ingred.setQuantity(recipe.getIngredients().get(ingredient));
-            rec.getRecipeingredientsList().add(ingred);
+        catch (Exception e) {
+            throw e;
         }
     }
     
-    public void addComment(int recipeID, Comment comment) {  
+    private void addRecipeData(Recipe recipe, int recipeID) throws Exception{
+        
+        try {
+            Recipes rec = entityManager.find(Recipes.class, recipeID);
+        
+            int i =1;
+            for (byte[] picture : recipe.getImages()) {
+                RecipepicturesPK picPK = new RecipepicturesPK(recipeID, i);
+                Recipepictures pic = new Recipepictures(picPK);
+                pic.setPicture(picture);
+                rec.getRecipepicturesList().add(pic);
+                i++;
+            }
+         
+            for (String cuisine : recipe.getCuisines()) {
+                RecipecuisinesPK cuisPK = new RecipecuisinesPK(recipeID, cuisine);
+                Recipecuisines cuis = new Recipecuisines(cuisPK);
+                rec.getRecipecuisinesList().add(cuis);
+            }
+        
+            i = 1;
+            for (String instruction : recipe.getInstructions()) {
+                RecipeinstructionsPK instrucPK = new RecipeinstructionsPK(recipeID ,i);
+                Recipeinstructions instruc = new Recipeinstructions(instrucPK);
+                instruc.setInstruction(instruction);
+                rec.getRecipeinstructionsList().add(instruc);
+                i++;
+            }
+        
+            for (String ingredient : recipe.getIngredients().keySet()) {
+                RecipeingredientsPK ingredPK = new RecipeingredientsPK(recipeID, ingredient);
+                Recipeingredients ingred = new Recipeingredients(ingredPK);
+                ingred.setQuantity(recipe.getIngredients().get(ingredient));
+                rec.getRecipeingredientsList().add(ingred);
+            }
+        }
+        catch (Exception e) {
+            throw e;
+        }
+    }
+    
+    public Recipe getRecipe(int recipeID) {
+        Recipes recipe = entityManager.find(Recipes.class, recipeID);
+        if (recipe == null)
+            return null;
+        else
+            return convertToRecipe(recipe);
+    }
+    
+    public void addComment(int recipeID, Comment comment) throws Exception {  
         Recipes rec = entityManager.find(Recipes.class, recipeID);
+        if (rec == null)
+            throw new Exception();
+
         entityManager.getTransaction().begin();
         Recipecomments com = new Recipecomments(recipeID, rec.getRecipecommentsList().size() + 1);
-        com.setCommentauthor(entityManager.find(Userprofiles.class, comment.getAuthor()));
+        Userprofiles author = entityManager.find(Userprofiles.class, comment.getAuthor());
+        if (author == null) 
+            throw new Exception();
+        com.setCommentauthor(author);
         com.setCommenttext(comment.getComment());
         rec.getRecipecommentsList().add(com);
         entityManager.getTransaction().commit();
     }
   
-    public void addPicture(int recipeID, byte[] picture) {
+    public void addPicture(int recipeID, byte[] picture) throws Exception {
         Recipes rec = entityManager.find(Recipes.class, recipeID);
+        if (rec == null)
+            throw new Exception();
         entityManager.getTransaction().begin();
         Recipepictures pic = new Recipepictures(recipeID, rec.getRecipepicturesList().size() + 1);
         pic.setPicture(picture);
         rec.getRecipepicturesList().add(pic);
         entityManager.getTransaction().commit();
-    }
-    
-    public Recipe getRecipe(int recipeID) {
-        Recipes recipe = entityManager.find(Recipes.class, recipeID);
-        return convertToRecipe(recipe);
     }
     
     public CommentList getComments(int recipeID){
@@ -180,7 +209,13 @@ public class RecipeDbController {
             sqlString += " author = '" + author + "'";
         }
         
-        Query searchRecipes = entityManager.createNativeQuery(sqlString, Recipes.class);
+        Query searchRecipes;
+        try {
+            searchRecipes = entityManager.createNativeQuery(sqlString, Recipes.class);
+        }
+        catch (Exception e) {
+            return null;
+        }
                 
         List<Recipes> resultList;
         ArrayList<Recipe> results = new ArrayList<>();
@@ -197,6 +232,8 @@ public class RecipeDbController {
         List<Recipes> resultList;
         ArrayList<Recipe> results = new ArrayList<>();
         Userprofiles user = entityManager.find(Userprofiles.class, email);
+        if (user == null)
+            return null;
         resultList = user.getRecipesList();
         for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);

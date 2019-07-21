@@ -1,6 +1,7 @@
 package DatabaseAccess;
 
 import com.google.gson.Gson;
+import java.util.ArrayList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,8 +31,15 @@ public class RecipeResource {
     @Path("add")
     public String addRecipe(String recipeJson) {
        Recipe recipe = new Gson().fromJson(recipeJson, Recipe.class);
-       recipeDB.addRecipe(recipe);
-       recipeDB.close();
+       try {
+           recipeDB.addRecipe(recipe);
+       }
+       catch (Exception e) {
+           return null;
+       }
+       finally {
+           recipeDB.close();
+       }
        return new Gson().toJson(new TextMessage("added recipe " + recipe.getName()));
     }
     
@@ -47,25 +55,39 @@ public class RecipeResource {
     @Path("{skill}/{cuisine}/{type}/{author}")
     public String searchRecipes(@PathParam("skill") String skill, @PathParam("cuisine") String cuisine,
                                   @PathParam("type") String type, @PathParam("author") String author) {
-       RecipeList results = new RecipeList(recipeDB.searchRecipes(skill, cuisine, type, author));
+       ArrayList<Recipe> results = recipeDB.searchRecipes(skill, cuisine, type, author);
        recipeDB.close();
-       return new Gson().toJson(results);
+       if (results == null)
+           return new Gson().toJson(null);
+       else
+           return new Gson().toJson(new RecipeList(results));
     }
     
     @GET
     @Path("getUsersRecipes/{email}")
     public String getUsersRecipes(@PathParam("email") String email) {
-        RecipeList results = new RecipeList(recipeDB.getUsersRecipes(email));
+        
+        ArrayList<Recipe> results = recipeDB.getUsersRecipes(email);
         recipeDB.close();
-        return new Gson().toJson(results);
+        if (results == null) 
+            return new Gson().toJson(null);
+        else
+            return new Gson().toJson(new RecipeList(results));
     }
     
     @POST
     @Path("addComment/{recipeID}")
     public String addComment(@PathParam("recipeID") int recipeID, String commentJson) {
        Comment comment = new Gson().fromJson(commentJson, Comment.class);
-       recipeDB.addComment(recipeID, comment);
-       recipeDB.close();
+       try {
+           recipeDB.addComment(recipeID, comment);
+       }
+       catch (Exception e) {
+           return new Gson().toJson(null);
+       }
+       finally {
+           recipeDB.close();
+       }
        return new Gson().toJson(new TextMessage("added comment to recipe " + recipeID));
     }
     
@@ -73,8 +95,15 @@ public class RecipeResource {
     @Path("addPicture/{recipeID}")
     public String addPicture(@PathParam("recipeID") int recipeID, String pictureJson) {
        byte[] picture = new Gson().fromJson(pictureJson, byte[].class);
-       recipeDB.addPicture(recipeID, picture);
-       recipeDB.close();
+       try {
+           recipeDB.addPicture(recipeID, picture);
+       }
+       catch (Exception e) {
+           return new Gson().toJson(null);
+       }
+       finally {
+           recipeDB.close();
+       }
        return new Gson().toJson(new TextMessage("picture added to recipe " + recipeID));
     }
     
