@@ -59,6 +59,25 @@ public class UserProfileResource {
     }
     
     @GET
+    @Path("forgotPassword/{userEmail}")
+    public String forgotPassword(@PathParam("userEmail") String userEmail) {
+        String password = recipeDB.getPassword(userEmail);
+        if (password != null) {
+            EmailSender sender = new EmailSender(userEmail, password, "retrieve password");
+            try {
+                sender.sendEmail();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            return "email sent to " + userEmail;
+        }
+        else 
+            return null;
+    }
+    
+    @GET
     @Path("addFollower/{userEmail}/{followerEmail}")
     public String addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
         try {
