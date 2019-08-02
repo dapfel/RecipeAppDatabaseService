@@ -63,7 +63,7 @@ public class UserProfileResource {
     public String forgotPassword(@PathParam("userEmail") String userEmail) {
         String password = recipeDB.getPassword(userEmail);
         if (password != null) {
-            EmailSender sender = new EmailSender(userEmail, password, "retrieve password");
+            EmailSender sender = new EmailSender(userEmail,"Your password is: " + password, "Retrieve Password");
             try {
                 sender.sendEmail();
             }
@@ -71,7 +71,7 @@ public class UserProfileResource {
                 e.printStackTrace();
                 return null;
             }
-            return "email sent to " + userEmail;
+            return new Gson().toJson(new TextMessage("email sent to " + userEmail));
         }
         else 
             return null;

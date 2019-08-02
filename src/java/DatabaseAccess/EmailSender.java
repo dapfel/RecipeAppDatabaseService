@@ -1,6 +1,6 @@
 package DatabaseAccess;
 
-import javax.annotation.Resource;
+import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -16,8 +16,7 @@ public class EmailSender {
     private final String emailAddress;
     private final String emailMessage;
     private final String subject;
-    @Resource(lookup = "mail/mySession")
-    private Session mailSession;
+
 
     public EmailSender(String emailAddress, String emailMessage, String subject) {
         this.emailAddress = emailAddress;
@@ -26,17 +25,27 @@ public class EmailSender {
     }
 
     public void sendEmail() throws Exception {
-        String sender = "doNotReply@recipeApp.com";
+        String sender = "recipeappmailserver@gmail.com";
+        String senderPassword = "recipeApp1234";
         String recipient = emailAddress;
         
         try {
-            MimeMessage message = new MimeMessage(mailSession);
-            message.setFrom(new InternetAddress(sender));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-            message.setSubject(subject);
-            message.setText(emailMessage);
+            Properties mailServerProperties = System.getProperties();
+            mailServerProperties.put("mail.smtp.port", "587");
+	    mailServerProperties.put("mail.smtp.auth", "true");
+	    mailServerProperties.put("mail.smtp.starttls.enable", "true");
+            mailServerProperties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+ 
+	    Session session = Session.getDefaultInstance(mailServerProperties, null);
+	    MimeMessage message = new MimeMessage(session);
+	    message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+	    message.setSubject(subject);
+	    String emailBody = emailMessage;
+	    message.setContent(emailBody, "text/plain");
 
-            Transport.send(message);
+            Transport transport = session.getTransport("smtp");
+            transport.connect("smtp.gmail.com",sender,senderPassword);
+            transport.sendMessage(message,message.getAllRecipients());
 
         } 
         catch (Exception e) {
