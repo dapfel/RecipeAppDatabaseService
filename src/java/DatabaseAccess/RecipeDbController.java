@@ -270,7 +270,9 @@ public class RecipeDbController {
     private UserProfile convertToUserProfile(Userprofiles user) {
         
         // convert skillLevel string to skillLevel enum type
-        skillLevel skill = skillLevel.valueOf(user.getSkilllevel());
+        skillLevel skill = null;
+        if (user.getSkilllevel() != null)
+            skill = skillLevel.valueOf(user.getSkilllevel());
         
         // convert Followers lists of Userprofiles to lists of email strings
         ArrayList<String> followers = new ArrayList<>();
@@ -302,7 +304,9 @@ public class RecipeDbController {
         userP.setCountry(user.getCountry());
         
         // convert skillLevel enum type to skillLevel string
-        String skill = user.getCookingSkills().name();
+        String skill = null;
+        if (user.getCookingSkills() != null) 
+            skill = user.getCookingSkills().name();
         userP.setSkilllevel(skill);
         
         // initialize empty lists of Userprofiles
@@ -333,11 +337,15 @@ public class RecipeDbController {
         recipe.setReleaseDate(recipes.getReleasedate());
         recipe.setAuthor(recipes.getAuthor().getEmail());
         // convert skill level string to skillLevel enum type
-        skillLevel skill = skillLevel.valueOf(recipes.getSkilllevel());
+        skillLevel skill = null;
+        if (recipe.getSkillLevel() != null)
+            skill = skillLevel.valueOf(recipes.getSkilllevel());
         recipe.setSkillLevel(skill);
         
         // convert recipe type string to recipeType enum type
-        recipeType type = recipeType.valueOf(recipes.getType());
+        recipeType type = null;
+        if (recipe.getType() != null)
+            type = recipeType.valueOf(recipes.getType());
         recipe.setType(type);
         
         for (Recipecuisines cuisine : recipes.getRecipecuisinesList()) {
@@ -366,11 +374,15 @@ public class RecipeDbController {
         recipes.setAuthor(author);
         
         // convert skillLevel enum type to skill level string
-        String skill = recipe.getSkillLevel().name();
+        String skill = null;
+        if (recipe.getSkillLevel() != null)
+            skill = recipe.getSkillLevel().name();
         recipes.setSkilllevel(skill);
         
         // convert recipeType enum type to recipe type string
-        String type = recipe.getType().name();
+        String type = null;
+        if (recipe.getType() != null);
+            type = recipe.getType().name();
         recipes.setType(type);
         
         ArrayList<Recipecuisines> cuisines = new ArrayList<>();
