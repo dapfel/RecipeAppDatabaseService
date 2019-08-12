@@ -381,7 +381,7 @@ public class RecipeDbController {
         
         // convert recipeType enum type to recipe type string
         String type = null;
-        if (recipe.getType() != null);
+        if (recipe.getType() != null)
             type = recipe.getType().name();
         recipes.setType(type);
         
