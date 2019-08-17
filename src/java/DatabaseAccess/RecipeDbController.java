@@ -59,7 +59,19 @@ public class RecipeDbController {
            return user.getPassword();      
     }
     
-    public void addFollower(String userEmail, String followerEmail)throws Exception {
+    public void changeProfilePic(String userEmail, byte[] pic) throws Exception {
+        entityManager.getTransaction().begin();
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        if (user == null) {
+            entityManager.getTransaction().commit();
+            throw new Exception();
+        }      
+        
+        user.setProfilePic(pic);
+        entityManager.getTransaction().commit();
+    }
+    
+    public void addFollower(String userEmail, String followerEmail) throws Exception {
         entityManager.getTransaction().begin();
         Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
         Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
@@ -289,7 +301,7 @@ public class RecipeDbController {
             cuisines.add(userCuisine.getUsercuisinesPK().getCuisine());
         }
         
-        return new UserProfile(user.getEmail(), user.getFirstname(), user.getLastname(), cuisines, skill, user.getCountry(), followers, followerOf);
+        return new UserProfile(user.getEmail(), user.getFirstname(), user.getLastname(), cuisines, skill, user.getCountry(), user.getProfilePic(), followers, followerOf);
     }
     
      /**
@@ -302,6 +314,7 @@ public class RecipeDbController {
         userP.setFirstname(user.getFirstName());
         userP.setLastname(user.getLastName());
         userP.setCountry(user.getCountry());
+        userP.setProfilePic(user.getProfilePic());
         
         // convert skillLevel enum type to skillLevel string
         String skill = null;

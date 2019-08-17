@@ -13,19 +13,21 @@ public class UserProfile implements Serializable {
     private skillLevel cookingSkills;
     private ArrayList<String> cuisines;
     private String country;
+    private byte[] profilePic;
     private ArrayList<String> followers; // emails of followers
     private ArrayList<String> followerOf; // emails of people the user follows
 
     public UserProfile() {
     }
     
-    public UserProfile(String email, String firstName, String lastName, ArrayList<String> cuisines, skillLevel cookingSkills, String country, ArrayList<String> followers, ArrayList<String> followerOf) {
+    public UserProfile(String email, String firstName, String lastName, ArrayList<String> cuisines, skillLevel cookingSkills, String country, byte[] profilePic, ArrayList<String> followers, ArrayList<String> followerOf) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.cookingSkills = cookingSkills;
         this.cuisines = cuisines;
         this.country = country;
+        this.profilePic = profilePic;
         this.followers = followers;
         this.followerOf = followerOf;
     }
@@ -72,6 +74,14 @@ public class UserProfile implements Serializable {
 
     public void setCookingSkills(skillLevel cookingSkills) {
         this.cookingSkills = cookingSkills;
+    }
+
+    public byte[] getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(byte[] profilePic) {
+        this.profilePic = profilePic;
     }
 
     public void setCountry(String country) {

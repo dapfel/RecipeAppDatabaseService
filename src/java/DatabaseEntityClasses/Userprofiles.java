@@ -57,6 +57,8 @@ public class Userprofiles implements Serializable {
     private String country;
     @Column(name = "SKILLLEVEL")
     private String skilllevel;
+    @Column(name = "PROFILEPIC")
+    private byte[] profilePic;
     @JoinTable(name = "FOLLOWS", joinColumns = {
         @JoinColumn(name = "FOLLOWEDEMAIL", referencedColumnName = "EMAIL")}, inverseJoinColumns = {
         @JoinColumn(name = "FOLLOWEREMAIL", referencedColumnName = "EMAIL")})
@@ -122,6 +124,14 @@ public class Userprofiles implements Serializable {
 
     public void setSkilllevel(String skilllevel) {
         this.skilllevel = skilllevel;
+    }
+
+    public byte[] getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(byte[] profilePic) {
+        this.profilePic = profilePic;
     }
 
     @XmlTransient

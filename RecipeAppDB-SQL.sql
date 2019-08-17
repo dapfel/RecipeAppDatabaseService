@@ -15,6 +15,7 @@ CREATE TABLE UserProfiles (
    lastName varchar (30),
    country varchar (30),
    skillLevel varchar (20),
+   profilePic BLOB (64000),
    PRIMARY KEY (email)
 );
 

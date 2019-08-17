@@ -78,6 +78,22 @@ public class UserProfileResource {
     }
     
     @GET
+    @Path("changeProfilePic/{userEmail}")
+    public String changeProfilePic(String picJson, @PathParam("userEmail") String userEmail) {
+        ProfilePic pic = new Gson().fromJson(picJson, ProfilePic.class);
+        try {
+            recipeDB.changeProfilePic(userEmail, pic.getPicture());
+        }
+        catch (Exception e) {
+            return new Gson().toJson(null);
+        }
+        finally {
+            recipeDB.close();
+        }
+        return new Gson().toJson(new TextMessage("change profile pic for " + userEmail));       
+    }
+    
+    @GET
     @Path("addFollower/{userEmail}/{followerEmail}")
     public String addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
         try {
