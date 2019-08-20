@@ -77,7 +77,7 @@ public class UserProfileResource {
             return null;
     }
     
-    @GET
+    @POST
     @Path("changeProfilePic/{userEmail}")
     public String changeProfilePic(String picJson, @PathParam("userEmail") String userEmail) {
         ProfilePic pic = new Gson().fromJson(picJson, ProfilePic.class);

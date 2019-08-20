@@ -194,24 +194,6 @@ public class RecipeDbController {
         entityManager.getTransaction().commit();
     }
     
-    public CommentList getComments(int recipeID){
-        Recipes rec = entityManager.find(Recipes.class, recipeID);
-        CommentList comments = new CommentList();
-        for (Recipecomments com : rec.getRecipecommentsList()) {
-            comments.add(new Comment(com.getCommentauthor().getEmail(), com.getCommenttext()));
-        }
-        return comments;
-    }
-    
-    public PictureList getPictures(int recipeID){
-        Recipes rec = entityManager.find(Recipes.class, recipeID);
-        PictureList pictures = new PictureList();
-        for (Recipepictures pic : rec.getRecipepicturesList()) {
-            pictures.add(pic.getPicture());
-        }
-        return pictures;
-    }
-    
     public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author) {
         String sqlString = "SELECT DISTINCT * FROM Recipes NATURAL JOIN Recipecuisines";
         
@@ -371,6 +353,12 @@ public class RecipeDbController {
             
         for (Recipeinstructions instruction: recipes.getRecipeinstructionsList())
             recipe.getInstructions().add(instruction.getRecipeinstructionsPK().getInstructionnum() - 1, instruction.getInstruction());
+        
+        for (Recipepictures picture: recipes.getRecipepicturesList())
+            recipe.getImages().add(picture.getPicture());
+        
+        for (Recipecomments comment: recipes.getRecipecommentsList())
+            recipe.getComments().add(new Comment(comment.getCommentauthor().getEmail(),comment.getCommenttext()));
         
         return recipe;
     }

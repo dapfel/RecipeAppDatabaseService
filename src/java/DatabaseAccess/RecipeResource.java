@@ -107,22 +107,6 @@ public class RecipeResource {
        return new Gson().toJson(new TextMessage("picture added to recipe " + recipeID));
     }
     
-    @GET
-    @Path("getComments/{recipeID}")
-    public String getComments(@PathParam("recipeID") int recipeID) {
-        String commentsJson = new Gson().toJson(recipeDB.getComments(recipeID));
-        recipeDB.close();
-        return commentsJson;
-    }
-    
-    @GET
-    @Path("getPictures/{recipeID}")
-    public String getPictures(@PathParam("recipeID") int recipeID) {
-        String picturesJson = new Gson().toJson(recipeDB.getPictures(recipeID));
-        recipeDB.close();
-        return picturesJson;
-    }
-    
     /**
      * hold text response from server to app
      */
