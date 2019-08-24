@@ -50,6 +50,8 @@ public class Recipes implements Serializable {
     private Integer recipeid;
     @Column(name = "NAME")
     private String name;
+    @Column (name = "DESCRIPTION")
+    private String description;
     @Column(name = "TYPE")
     private String type;
     @Column(name = "SKILLLEVEL")
@@ -92,6 +94,14 @@ public class Recipes implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getType() {

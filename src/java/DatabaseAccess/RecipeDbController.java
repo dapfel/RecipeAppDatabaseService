@@ -331,6 +331,8 @@ public class RecipeDbController {
         recipe.setName(recipes.getName());
         recipe.setReleaseDate(recipes.getReleasedate());
         recipe.setAuthor(recipes.getAuthor().getEmail());
+        recipe.setDescription(recipes.getDescription());
+        
         // convert skill level string to skillLevel enum type
         skillLevel skill = null;
         if (recipe.getSkillLevel() != null)
@@ -373,6 +375,7 @@ public class RecipeDbController {
         recipes.setReleasedate(recipe.getReleaseDate());
         Userprofiles author = entityManager.find(Userprofiles.class, recipe.getAuthor());
         recipes.setAuthor(author);
+        recipes.setDescription(recipe.getDescription());
         
         // convert skillLevel enum type to skill level string
         String skill = null;

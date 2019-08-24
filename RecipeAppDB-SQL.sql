@@ -15,7 +15,7 @@ CREATE TABLE UserProfiles (
    lastName varchar (30),
    country varchar (30),
    skillLevel varchar (20),
-   profilePic BLOB (64000),
+   profilePic BLOB (6M),
    PRIMARY KEY (email)
 );
 
@@ -37,6 +37,7 @@ CREATE TABLE Recipes (
    recipeID INT GENERATED ALWAYS AS IDENTITY 
                 (START WITH 1, INCREMENT BY 1),
    name varchar (40),
+   description varchar (200),
    type varchar (20),
    author varchar (320),
    skillLevel varchar (20),
@@ -55,7 +56,7 @@ CREATE TABLE RecipeCuisines (
 CREATE TABLE RecipePictures (
    recipeID INT,
    pictureNum INT,
-   picture BLOB (64000),
+   picture BLOB (6M),
    PRIMARY KEY (recipeID, pictureNum),
    FOREIGN KEY (recipeID) REFERENCES Recipes (recipeID)
 );
