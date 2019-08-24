@@ -360,7 +360,8 @@ public class RecipeDbController {
             recipe.getImages().add(picture.getPicture());
         
         for (Recipecomments comment: recipes.getRecipecommentsList())
-            recipe.getComments().add(new Comment(comment.getCommentauthor().getEmail(),comment.getCommenttext()));
+            recipe.getComments().add(new Comment(comment.getCommentauthor().getEmail(),comment.getCommenttext(),
+                                                 comment.getCommentauthor().getFirstname() + " " + comment.getCommentauthor().getLastname()));
         
         return recipe;
     }
