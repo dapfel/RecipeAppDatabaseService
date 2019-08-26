@@ -194,7 +194,7 @@ public class RecipeDbController {
         entityManager.getTransaction().commit();
     }
     
-    public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author) {
+    public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author, String freeText) {
         String sqlString = "SELECT DISTINCT * FROM Recipes NATURAL JOIN Recipecuisines";
         
         if (!skill.equals("null") || !cuisine.equals("null") || !type.equals("null") || !author.equals("null"))
@@ -228,11 +228,22 @@ public class RecipeDbController {
         }
                 
         List<Recipes> resultList;
+        resultList = searchRecipes.getResultList(); 
+        
         ArrayList<Recipe> results = new ArrayList<>();
-        resultList = searchRecipes.getResultList();
-        for (int i = 0; i < resultList.size(); i++) {
+        // only adds to results those recipes that contain the user inputed keywords (freeText) in their name or description
+        if (!freeText.equals("null")) { 
+            for (int i = 0; i < resultList.size(); i++) {
+                Recipes recipe = resultList.get(i);
+                if (recipe.getName().contains(freeText) || recipe.getDescription().contains(freeText))
+                    results.add(convertToRecipe(recipe));
+            }
+        }
+        else { 
+            for (int i = 0; i < resultList.size(); i++) {
             Recipes recipe = resultList.get(i);
             results.add(convertToRecipe(recipe));
+            }
         }
         
         return results;
