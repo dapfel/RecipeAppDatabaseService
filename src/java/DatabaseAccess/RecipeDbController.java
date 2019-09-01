@@ -98,15 +98,18 @@ public class RecipeDbController {
        entityManager.getTransaction().commit();
     }
     
-    public void addRecipe(Recipe recipe) throws Exception {
+    public int addRecipe(Recipe recipe) throws Exception {
         Recipes recipes = convertToRecipesEntity(recipe);
-        
+        int recipeID = 0;
         try {
             entityManager.getTransaction().begin();       
             entityManager.persist(recipes);
             entityManager.flush();
-            addRecipeData(recipe, recipes.getRecipeid());
+            recipeID = recipes.getRecipeid();
+            addRecipeData(recipe, recipeID);
             entityManager.getTransaction().commit();
+            
+            return recipeID;
         }
         catch (Exception e) {
             throw e;

@@ -31,8 +31,9 @@ public class RecipeResource {
     @Path("add")
     public String addRecipe(String recipeJson) {
        Recipe recipe = new Gson().fromJson(recipeJson, Recipe.class);
+       int recipeID = 0;
        try {
-           recipeDB.addRecipe(recipe);
+           recipeID = recipeDB.addRecipe(recipe);
        }
        catch (Exception e) {
            return null;
@@ -40,7 +41,8 @@ public class RecipeResource {
        finally {
            recipeDB.close();
        }
-       return new Gson().toJson(new TextMessage("added recipe " + recipe.getName()));
+       recipe.setRecipeId(recipeID);
+       return new Gson().toJson(recipe);
     }
     
     @GET
