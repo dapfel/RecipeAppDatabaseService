@@ -30,7 +30,7 @@ public class RecipeDbController {
             return null;
     }
     
-    public void addUser(UserProfile user, String password) throws Exception {
+    public UserProfile addUser(UserProfile user, String password) throws Exception {
         Userprofiles userP = convertToUserprofilesEntity(user, password);
         
         try {
@@ -41,6 +41,8 @@ public class RecipeDbController {
         catch (Exception e) {
             throw e;
         }
+        
+        return getUser(user.getEmail());
     }
     
     public UserProfile getUser(String email) {
@@ -59,43 +61,49 @@ public class RecipeDbController {
            return user.getPassword();      
     }
     
-    public void changeProfilePic(String userEmail, byte[] pic) throws Exception {
+    public UserProfile changeProfilePic(String userEmail, byte[] pic) {
         entityManager.getTransaction().begin();
         Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
         if (user == null) {
             entityManager.getTransaction().commit();
-            throw new Exception();
+            return null;
         }      
         
         user.setProfilePic(pic);
         entityManager.getTransaction().commit();
+        
+        return getUser(userEmail);
     }
     
-    public void addFollower(String userEmail, String followerEmail) throws Exception {
+    public UserProfile addFollower(String userEmail, String followerEmail) {
         entityManager.getTransaction().begin();
         Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
         Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
         if (user == null || follower == null) {
             entityManager.getTransaction().commit();
-            throw new Exception();
+            return null;
         }
 
         user.getFollowers().add(follower);
         entityManager.getTransaction().commit();
+        
+        return getUser(userEmail);
     }
     
-    public void deleteFollower(String userEmail, String followerEmail) throws Exception {
+    public UserProfile deleteFollower(String userEmail, String followerEmail) {
         entityManager.getTransaction().begin();
         Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
         Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
         if (user == null || follower == null) {
             entityManager.getTransaction().commit();
-            throw new Exception();
+            return null;
         }
             
        user.getFollowers().remove(follower);
        follower.getFollowerOf().remove(user);
        entityManager.getTransaction().commit();
+       
+       return getUser(userEmail);
     }
     
     public int addRecipe(Recipe recipe) throws Exception {
@@ -165,36 +173,40 @@ public class RecipeDbController {
             return convertToRecipe(recipe);
     }
     
-    public void addComment(int recipeID, Comment comment) throws Exception {  
+    public Recipe addComment(int recipeID, Comment comment) {  
         entityManager.getTransaction().begin();        
         Recipes rec = entityManager.find(Recipes.class, recipeID);
         if (rec == null) {
             entityManager.getTransaction().commit();
-            throw new Exception();
+            return null;
         }
 
         Recipecomments com = new Recipecomments(recipeID, rec.getRecipecommentsList().size() + 1);
         Userprofiles author = entityManager.find(Userprofiles.class, comment.getAuthor());
         if (author == null) 
-            throw new Exception();
+            return null;
         com.setCommentauthor(author);
         com.setCommenttext(comment.getComment());
         rec.getRecipecommentsList().add(com);
         entityManager.getTransaction().commit();
+        
+        return getRecipe(recipeID);
     }
   
-    public void addPicture(int recipeID, byte[] picture) throws Exception {
+    public Recipe addPicture(int recipeID, byte[] picture) throws Exception {
         entityManager.getTransaction().begin();        
         Recipes rec = entityManager.find(Recipes.class, recipeID);
         if (rec == null) {
             entityManager.getTransaction().commit();
-            throw new Exception();
+            return null;
         }
 
         Recipepictures pic = new Recipepictures(recipeID, rec.getRecipepicturesList().size() + 1);
         pic.setPicture(picture);
         rec.getRecipepicturesList().add(pic);
         entityManager.getTransaction().commit();
+        
+        return getRecipe(recipeID);
     }
     
     public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author, String freeText) {

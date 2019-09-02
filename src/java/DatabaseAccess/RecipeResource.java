@@ -82,52 +82,33 @@ public class RecipeResource {
     @Path("addComment/{recipeID}")
     public String addComment(@PathParam("recipeID") int recipeID, String commentJson) {
        Comment comment = new Gson().fromJson(commentJson, Comment.class);
+       Recipe recipe = null;
        try {
-           recipeDB.addComment(recipeID, comment);
+           recipe = recipeDB.addComment(recipeID, comment);
        }
        catch (Exception e) {
-           return new Gson().toJson(null);
+           recipe = null;
        }
        finally {
            recipeDB.close();
        }
-       return new Gson().toJson(new TextMessage("added comment to recipe " + recipeID));
+       return new Gson().toJson(recipe);
     }
     
     @POST
     @Path("addPicture/{recipeID}")
     public String addPicture(@PathParam("recipeID") int recipeID, String pictureJson) {
        byte[] picture = new Gson().fromJson(pictureJson, byte[].class);
+       Recipe recipe = null;
        try {
-           recipeDB.addPicture(recipeID, picture);
+           recipe = recipeDB.addPicture(recipeID, picture);
        }
        catch (Exception e) {
-           return new Gson().toJson(null);
+           recipe = null;
        }
        finally {
            recipeDB.close();
        }
-       return new Gson().toJson(new TextMessage("picture added to recipe " + recipeID));
-    }
-    
-    /**
-     * hold text response from server to app
-     */
-    class TextMessage {
-        private String message;
-
-        public TextMessage(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-        
-        
+       return new Gson().toJson(recipe);
     }
 }

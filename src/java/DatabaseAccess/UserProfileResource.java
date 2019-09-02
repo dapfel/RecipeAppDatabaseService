@@ -39,15 +39,15 @@ public class UserProfileResource {
     public String addUser(String userJson, @PathParam("password") String password) {
        UserProfile user = new Gson().fromJson(userJson, UserProfile.class);
        try {
-           recipeDB.addUser(user, password);
+           user = recipeDB.addUser(user, password);
        }
        catch (Exception e) {
-           return new Gson().toJson(null);
+           user = null;
        }
        finally {
            recipeDB.close();
        }
-       return new Gson().toJson(new TextMessage("added " + user.getEmail()));
+       return new Gson().toJson(user);
     }
     
     @GET
@@ -68,7 +68,6 @@ public class UserProfileResource {
                 sender.sendEmail();
             }
             catch (Exception e) {
-                e.printStackTrace();
                 return null;
             }
             return new Gson().toJson(new TextMessage("email sent to " + userEmail));
@@ -81,46 +80,49 @@ public class UserProfileResource {
     @Path("changeProfilePic/{userEmail}")
     public String changeProfilePic(String picJson, @PathParam("userEmail") String userEmail) {
         ProfilePic pic = new Gson().fromJson(picJson, ProfilePic.class);
+        UserProfile user = null;
         try {
-            recipeDB.changeProfilePic(userEmail, pic.getPicture());
+            user = recipeDB.changeProfilePic(userEmail, pic.getPicture());
         }
         catch (Exception e) {
-            return new Gson().toJson(null);
+            user = null;
         }
         finally {
             recipeDB.close();
         }
-        return new Gson().toJson(new TextMessage("change profile pic for " + userEmail));       
+        return new Gson().toJson(user);       
     }
     
     @GET
     @Path("addFollower/{userEmail}/{followerEmail}")
     public String addFollower(@PathParam("userEmail") String userEmail,@PathParam("followerEmail") String followerEmail) {
+        UserProfile user = null;
         try {
-            recipeDB.addFollower(userEmail, followerEmail);
+            user = recipeDB.addFollower(userEmail, followerEmail);
         }
         catch (Exception e) {
-            return new Gson().toJson(null);
+            user = null;
         }
         finally {
             recipeDB.close();
         }
-        return new Gson().toJson(new TextMessage("added follower " + followerEmail + " for " + userEmail));
+        return new Gson().toJson(user);
     }
     
     @GET
     @Path("deleteFollower/{userEmail}/{followerEmail}")
     public String deleteFollower(@PathParam("userEmail") String userEmail, @PathParam("followerEmail") String followerEmail) {
+        UserProfile user = null;
         try {
-            recipeDB.deleteFollower(userEmail, followerEmail);
+            user = recipeDB.deleteFollower(userEmail, followerEmail);
         }
         catch (Exception e) {
-            return new Gson().toJson(null);
+            user = null;
         }
         finally {
             recipeDB.close();
         }
-        return new Gson().toJson(new TextMessage("deleted follower " + followerEmail + " for " + userEmail));
+        return new Gson().toJson(user);
     }
     
      /**
