@@ -68,12 +68,12 @@ public class UserProfileResource {
                 sender.sendEmail();
             }
             catch (Exception e) {
-                return null;
+                return new Gson().toJson(null);
             }
             return new Gson().toJson(new TextMessage("email sent to " + userEmail));
         }
         else 
-            return null;
+            return new Gson().toJson(null);
     }
     
     @POST
