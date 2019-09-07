@@ -78,6 +78,18 @@ public class RecipeResource {
             return new Gson().toJson(new RecipeList(results));
     }
     
+    @GET
+    @Path("getFollowedRecipes/{email}")
+    public String getFollowedRecipes(@PathParam("email") String email) {
+        
+        ArrayList<Recipe> results = recipeDB.getFollowedRecipes(email);
+        recipeDB.close();
+        if (results == null) 
+            return new Gson().toJson(null);
+        else
+            return new Gson().toJson(new RecipeList(results));
+    }
+    
     @POST
     @Path("addComment/{recipeID}")
     public String addComment(@PathParam("recipeID") int recipeID, String commentJson) {

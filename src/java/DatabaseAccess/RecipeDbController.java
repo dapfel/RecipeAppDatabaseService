@@ -279,6 +279,24 @@ public class RecipeDbController {
         return results;
     }  
     
+    public ArrayList<Recipe> getFollowedRecipes(String email) {
+        List<Recipes> recipesList;
+        ArrayList<Recipe> results = new ArrayList<>();
+        Userprofiles user = entityManager.find(Userprofiles.class, email);
+        if (user == null)
+            return null;
+        
+        for (Userprofiles followedUser : user.getFollowerOf()) {
+            recipesList = followedUser.getRecipesList();
+            for (int i = 0; i < recipesList.size(); i++) {
+                Recipes recipe = recipesList.get(i);
+                results.add(convertToRecipe(recipe));
+            }
+        }
+        
+        return results;
+    }  
+    
     public void close() {
         entityManager.close();
         entityManagerFactory.close();
