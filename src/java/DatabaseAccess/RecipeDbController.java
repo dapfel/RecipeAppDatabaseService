@@ -209,27 +209,35 @@ public class RecipeDbController {
         return getRecipe(recipeID);
     }
     
-    public ArrayList<Recipe> searchRecipes(String skill, String cuisine, String type, String author, String freeText) {
+    public ArrayList<Recipe> searchRecipes(String skill, String cuisines, String type, String author, String freeText) {
+        String[] cuisinesArray = null;
+        if (cuisines != null)
+            cuisinesArray = cuisines.split("\\+");
+       
         String sqlString = "SELECT DISTINCT * FROM Recipes NATURAL JOIN Recipecuisines";
         
-        if (!skill.equals("null") || !cuisine.equals("null") || !type.equals("null") || !author.equals("null"))
+        if (!skill.equals("null") || !cuisines.equals("null") || !type.equals("null") || !author.equals("null"))
             sqlString += " WHERE";
        
         if (!skill.equals("null")) {
             sqlString += " skilllevel = '" + skill + "'";
         }
-        if (!cuisine.equals("null")) {
+        if (!cuisines.equals("null")) {
             if (!skill.equals("null"))
                 sqlString += " AND";
-            sqlString += " cuisine = '" + cuisine +"'";
+            for (int i = 0; i < cuisinesArray.length; i++)
+                if (i == cuisinesArray.length - 1)
+                    sqlString += " cuisine = '" + cuisinesArray[i] +"'";
+                else
+                    sqlString += " cuisine = '" + cuisinesArray[i] +"'" + " OR";
         }
         if (!type.equals("null")) {
-            if (!cuisine.equals("null") || !skill.equals("null"))
+            if (!cuisines.equals("null") || !skill.equals("null"))
                 sqlString += " AND";
             sqlString += " type = '" + type + "'";
         }
         if (!author.equals("null")) {
-            if (!type.equals("null") || !cuisine.equals("null") || !skill.equals("null"))
+            if (!type.equals("null") || !cuisines.equals("null") || !skill.equals("null"))
                 sqlString += " AND";
             sqlString += " author = '" + author + "'";
         }
@@ -261,7 +269,20 @@ public class RecipeDbController {
             }
         }
         
-        return results;
+        return removeDuplicates(results);
+    }
+    
+    private static ArrayList<Recipe> removeDuplicates(ArrayList<Recipe> recipes) {
+        ArrayList<Recipe> result = new ArrayList<Recipe>();
+        for (int i = 0; i < recipes.size(); i++) {
+            for (int j = i + 1; j < recipes.size(); j++) {
+              if (recipes.get(i).getRecipeId() == recipes.get(j).getRecipeId())
+                  recipes.get(j).setRecipeId(-1);
+            }
+            if (recipes.get(i).getRecipeId() != -1)
+                result.add(recipes.get(i));
+        }
+        return result;
     }
     
     public ArrayList<Recipe> getUsersRecipes(String email) {

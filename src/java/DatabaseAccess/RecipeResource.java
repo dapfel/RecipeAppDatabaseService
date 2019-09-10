@@ -54,11 +54,11 @@ public class RecipeResource {
     }
     
     @GET
-    @Path("{skill}/{cuisine}/{type}/{author}/{freeText}")
-    public String searchRecipes(@PathParam("skill") String skill, @PathParam("cuisine") String cuisine,
+    @Path("{skill}/{cuisines}/{type}/{author}/{freeText}")
+    public String searchRecipes(@PathParam("skill") String skill, @PathParam("cuisines") String cuisines,
                                 @PathParam("type") String type, @PathParam("author") String author, 
                                 @PathParam("freeText") String freeText) {
-       ArrayList<Recipe> results = recipeDB.searchRecipes(skill, cuisine, type, author, freeText);
+       ArrayList<Recipe> results = recipeDB.searchRecipes(skill, cuisines, type, author, freeText);
        recipeDB.close();
        if (results == null)
            return new Gson().toJson(null);
