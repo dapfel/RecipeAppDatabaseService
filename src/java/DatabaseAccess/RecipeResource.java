@@ -58,7 +58,7 @@ public class RecipeResource {
     public String searchRecipes(@PathParam("skill") String skill, @PathParam("cuisines") String cuisines,
                                 @PathParam("type") String type, @PathParam("author") String author, 
                                 @PathParam("freeText") String freeText) {
-       ArrayList<Recipe> results = recipeDB.searchRecipes(skill, cuisines, type, author, freeText);
+       RecipeList results = recipeDB.searchRecipes(skill, cuisines, type, author, freeText);
        recipeDB.close();
        if (results == null)
            return new Gson().toJson(null);
@@ -70,7 +70,7 @@ public class RecipeResource {
     @Path("getUsersRecipes/{email}")
     public String getUsersRecipes(@PathParam("email") String email) {
         
-        ArrayList<Recipe> results = recipeDB.getUsersRecipes(email);
+        RecipeList results = recipeDB.getUsersRecipes(email);
         recipeDB.close();
         if (results == null) 
             return new Gson().toJson(null);
@@ -87,7 +87,7 @@ public class RecipeResource {
         if (results == null) 
             return new Gson().toJson(null);
         else
-            return new Gson().toJson(new RecipeList(results));
+            return new Gson().toJson(results);
     }
     
     @POST

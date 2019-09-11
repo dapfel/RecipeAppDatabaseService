@@ -7,6 +7,7 @@ package DatabaseAccess;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 public class RecipeList extends ArrayList<Recipe> {
        private static final long serialVersionUID = 1L;
@@ -23,4 +24,26 @@ public class RecipeList extends ArrayList<Recipe> {
     public void setRecipes(List<Recipe> recipes) {
         this.addAll(recipes);
     }
+    
+    public RecipeList sortByDate() {     
+        this.sort(new DateComparator());
+        return this;
+    }
+
+    class DateComparator implements Comparator {
+
+        @Override
+        public int compare(Object ob1, Object ob2) {
+            Recipe recipe1 = (Recipe) ob1;
+            Recipe recipe2 = (Recipe) ob2;
+            
+            if (recipe1.getReleaseDate().after(recipe2.getReleaseDate()))
+                return 1;
+            else if (recipe1.getReleaseDate().before(recipe2.getReleaseDate()))
+                return -1;
+            else
+                return 0;
+        } 
+    
+    } 
 }

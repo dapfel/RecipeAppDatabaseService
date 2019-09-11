@@ -209,7 +209,7 @@ public class RecipeDbController {
         return getRecipe(recipeID);
     }
     
-    public ArrayList<Recipe> searchRecipes(String skill, String cuisines, String type, String author, String freeText) {
+    public RecipeList searchRecipes(String skill, String cuisines, String type, String author, String freeText) {
         String[] cuisinesArray = null;
         if (cuisines != null)
             cuisinesArray = cuisines.split("\\+");
@@ -269,7 +269,8 @@ public class RecipeDbController {
             }
         }
         
-        return removeDuplicates(results);
+        results = removeDuplicates(results);
+        return (new RecipeList(results)).sortByDate();
     }
     
     private static ArrayList<Recipe> removeDuplicates(ArrayList<Recipe> recipes) {
@@ -285,7 +286,7 @@ public class RecipeDbController {
         return result;
     }
     
-    public ArrayList<Recipe> getUsersRecipes(String email) {
+    public RecipeList getUsersRecipes(String email) {
         List<Recipes> resultList;
         ArrayList<Recipe> results = new ArrayList<>();
         Userprofiles user = entityManager.find(Userprofiles.class, email);
@@ -297,7 +298,7 @@ public class RecipeDbController {
             results.add(convertToRecipe(recipe));
         }
         
-        return results;
+        return (new RecipeList(results)).sortByDate();
     }  
     
     public ArrayList<Recipe> getFollowedRecipes(String email) {
