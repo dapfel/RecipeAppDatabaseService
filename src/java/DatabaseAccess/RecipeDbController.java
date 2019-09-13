@@ -274,7 +274,7 @@ public class RecipeDbController {
     }
     
     private static ArrayList<Recipe> removeDuplicates(ArrayList<Recipe> recipes) {
-        ArrayList<Recipe> result = new ArrayList<Recipe>();
+        ArrayList<Recipe> result = new ArrayList<>();
         for (int i = 0; i < recipes.size(); i++) {
             for (int j = i + 1; j < recipes.size(); j++) {
               if (recipes.get(i).getRecipeId() == recipes.get(j).getRecipeId())

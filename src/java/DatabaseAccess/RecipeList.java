@@ -37,6 +37,9 @@ public class RecipeList extends ArrayList<Recipe> {
             Recipe recipe1 = (Recipe) ob1;
             Recipe recipe2 = (Recipe) ob2;
             
+            if (recipe1.getReleaseDate() == null || recipe2.getReleaseDate() == null )
+                return 0;
+            
             if (recipe1.getReleaseDate().after(recipe2.getReleaseDate()))
                 return 1;
             else if (recipe1.getReleaseDate().before(recipe2.getReleaseDate()))
