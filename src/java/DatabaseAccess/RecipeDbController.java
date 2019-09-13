@@ -75,6 +75,38 @@ public class RecipeDbController {
         return getUser(userEmail);
     }
     
+        public UserProfile updateUserProfile(String userEmail, String newPassword, String newFirstName, 
+                                             String newLastName, String newCountry, String newCuisines, String newSkillLevel) {
+        entityManager.getTransaction().begin();
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        if (user == null) {
+            entityManager.getTransaction().commit();
+            return null;
+        }
+
+        if (!newPassword.equals("null"))
+            user.setPassword(newPassword);
+        if (!newFirstName.equals("null"))
+            user.setFirstname(newFirstName);
+        if (!newLastName.equals("null"))
+            user.setLastname(newLastName);
+        if (!newCountry.equals("null")) 
+            user.setCountry(newCountry);
+        if (!newSkillLevel.equals("null"))
+            user.setSkilllevel(newSkillLevel);
+        if (!newCuisines.equals("null")) {
+            String[] newCuisinesArray = newCuisines.split("\\+");
+            for (String cuisineName : newCuisinesArray) {
+                Usercuisines newCuisine = new Usercuisines(userEmail, cuisineName);
+                if (!user.getUsercuisinesList().contains(newCuisine))
+                    user.getUsercuisinesList().add(newCuisine);
+            }
+        }
+        entityManager.getTransaction().commit();
+        
+        return getUser(userEmail);
+    }
+    
     public UserProfile addFollower(String userEmail, String followerEmail) {
         entityManager.getTransaction().begin();
         Userprofiles user = entityManager.find(Userprofiles.class, userEmail);

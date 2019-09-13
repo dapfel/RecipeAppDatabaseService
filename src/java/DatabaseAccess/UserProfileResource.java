@@ -110,6 +110,26 @@ public class UserProfileResource {
     }
     
     @GET
+    @Path("updateUserProfile/{userEmail}/{newPassword}/{newFirstName}/{newLastName}/{newCountry}/{newCuisines}/{newSkillLevel}")
+    public String updateUserProfile(@PathParam("userEmail") String userEmail, @PathParam("newPassword") String newPassword,
+                              @PathParam("newFirstName") String newFirstName, @PathParam("newLastName") String newLastName,
+                              @PathParam("newCountry") String newCountry, @PathParam("newCuisines") String newCuisines,
+                              @PathParam("newSkillLevel") String newSkillLevel) {
+        UserProfile user = null;
+        try {
+            user = recipeDB.updateUserProfile(userEmail, newPassword, newFirstName, newLastName, newCountry, newCuisines, newSkillLevel);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            user = null;
+        }
+        finally {
+            recipeDB.close();
+        }
+        return new Gson().toJson(user);
+    }
+    
+    @GET
     @Path("deleteFollower/{userEmail}/{followerEmail}")
     public String deleteFollower(@PathParam("userEmail") String userEmail, @PathParam("followerEmail") String followerEmail) {
         UserProfile user = null;
