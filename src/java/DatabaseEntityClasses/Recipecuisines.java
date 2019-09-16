@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DatabaseEntityClasses;
 
 import java.io.Serializable;
@@ -10,10 +6,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -21,11 +14,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "RECIPECUISINES")
-@XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Recipecuisines.findAll", query = "SELECT r FROM Recipecuisines r")
-    , @NamedQuery(name = "Recipecuisines.findByRecipeid", query = "SELECT r FROM Recipecuisines r WHERE r.recipecuisinesPK.recipeid = :recipeid")
-    , @NamedQuery(name = "Recipecuisines.findByCuisine", query = "SELECT r FROM Recipecuisines r WHERE r.recipecuisinesPK.cuisine = :cuisine")})
 public class Recipecuisines implements Serializable {
 
     private static final long serialVersionUID = 1L;

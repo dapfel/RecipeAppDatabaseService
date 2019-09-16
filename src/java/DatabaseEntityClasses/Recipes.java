@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DatabaseEntityClasses;
 
 import java.io.Serializable;
@@ -17,14 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import DatabaseAccess.UserProfile.skillLevel;
+import DatabaseAccess.Recipe.recipeType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 /**
  *
@@ -32,14 +28,6 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "RECIPES")
-@XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Recipes.findAll", query = "SELECT r FROM Recipes r")
-    , @NamedQuery(name = "Recipes.findByRecipeid", query = "SELECT r FROM Recipes r WHERE r.recipeid = :recipeid")
-    , @NamedQuery(name = "Recipes.findByName", query = "SELECT r FROM Recipes r WHERE r.name = :name")
-    , @NamedQuery(name = "Recipes.findByType", query = "SELECT r FROM Recipes r WHERE r.type = :type")
-    , @NamedQuery(name = "Recipes.findBySkilllevel", query = "SELECT r FROM Recipes r WHERE r.skilllevel = :skilllevel")
-    , @NamedQuery(name = "Recipes.findByReleasedate", query = "SELECT r FROM Recipes r WHERE r.releasedate = :releasedate")})
 public class Recipes implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,10 +40,12 @@ public class Recipes implements Serializable {
     private String name;
     @Column (name = "DESCRIPTION")
     private String description;
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "TYPE")
-    private String type;
+    private recipeType type;
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "SKILLLEVEL")
-    private String skilllevel;
+    private skillLevel skilllevel;
     @Column(name = "RELEASEDATE")
     @Temporal(TemporalType.DATE)
     private Date releasedate;
@@ -71,7 +61,7 @@ public class Recipes implements Serializable {
     @ManyToOne
     private Userprofiles author;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipes")
-    private List<Recipeingredients> recipeingredientsList;
+    private List<Recipeingredients> recipeingredientsList;  
 
     public Recipes() {
     }
@@ -104,20 +94,19 @@ public class Recipes implements Serializable {
         this.description = description;
     }
 
-    public String getType() {
+    public recipeType getType() {
         return type;
     }
-
-    public void setType(String type) {
+    public void setType(recipeType type) {
         this.type = type;
     }
 
-    public String getSkilllevel() {
-        return skilllevel;
+    public void setSkilllevel(skillLevel skilllevel) {
+        this.skilllevel = skilllevel;
     }
 
-    public void setSkilllevel(String skilllevel) {
-        this.skilllevel = skilllevel;
+    public skillLevel getSkilllevel() {
+        return skilllevel;
     }
 
     public Date getReleasedate() {
@@ -128,7 +117,6 @@ public class Recipes implements Serializable {
         this.releasedate = releasedate;
     }
 
-    @XmlTransient
     public List<Recipecomments> getRecipecommentsList() {
         return recipecommentsList;
     }
@@ -137,7 +125,6 @@ public class Recipes implements Serializable {
         this.recipecommentsList = recipecommentsList;
     }
 
-    @XmlTransient
     public List<Recipecuisines> getRecipecuisinesList() {
         return recipecuisinesList;
     }
@@ -146,7 +133,6 @@ public class Recipes implements Serializable {
         this.recipecuisinesList = recipecuisinesList;
     }
 
-    @XmlTransient
     public List<Recipepictures> getRecipepicturesList() {
         return recipepicturesList;
     }
@@ -155,7 +141,6 @@ public class Recipes implements Serializable {
         this.recipepicturesList = recipepicturesList;
     }
 
-    @XmlTransient
     public List<Recipeinstructions> getRecipeinstructionsList() {
         return recipeinstructionsList;
     }
@@ -171,8 +156,7 @@ public class Recipes implements Serializable {
     public void setAuthor(Userprofiles author) {
         this.author = author;
     }
-
-    @XmlTransient
+    
     public List<Recipeingredients> getRecipeingredientsList() {
         return recipeingredientsList;
     }

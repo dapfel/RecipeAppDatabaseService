@@ -3,12 +3,11 @@ package DatabaseAccess;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import DatabaseAccess.UserProfile.skillLevel;
-import DatabaseAccess.Recipe.recipeType;
 import DatabaseEntityClasses.*;
 import java.util.List;
 import java.util.ArrayList;
 import javax.persistence.Query;
+import DatabaseAccess.UserProfile.skillLevel;
 
 public class RecipeDbController {
     
@@ -67,12 +66,13 @@ public class RecipeDbController {
         if (user == null) {
             entityManager.getTransaction().commit();
             return null;
-        }      
-        
+        }             
         user.setProfilePic(pic);
-        entityManager.getTransaction().commit();
         
-        return getUser(userEmail);
+        UserProfile userP = convertToUserProfile(user);        
+        entityManager.getTransaction().commit();
+
+        return userP;
     }
     
         public UserProfile updateUserProfile(String userEmail, String newPassword, String newFirstName, 
@@ -93,7 +93,7 @@ public class RecipeDbController {
         if (!newCountry.equals("null")) 
             user.setCountry(newCountry);
         if (!newSkillLevel.equals("null"))
-            user.setSkilllevel(newSkillLevel);
+            user.setSkilllevel(skillLevel.valueOf(newSkillLevel));
         if (!newCuisines.equals("null")) {
             String[] newCuisinesArray = newCuisines.split("\\+");
             for (String cuisineName : newCuisinesArray) {
@@ -102,9 +102,10 @@ public class RecipeDbController {
                     user.getUsercuisinesList().add(newCuisine);
             }
         }
+        UserProfile userP = convertToUserProfile(user);
         entityManager.getTransaction().commit();
         
-        return getUser(userEmail);
+        return userP;
     }
     
     public UserProfile addFollower(String userEmail, String followerEmail) {
@@ -115,11 +116,12 @@ public class RecipeDbController {
             entityManager.getTransaction().commit();
             return null;
         }
-
         user.getFollowers().add(follower);
+        
+        UserProfile userP = convertToUserProfile(user);
         entityManager.getTransaction().commit();
         
-        return getUser(userEmail);
+        return userP;
     }
     
     public UserProfile deleteFollower(String userEmail, String followerEmail) {
@@ -129,51 +131,50 @@ public class RecipeDbController {
         if (user == null || follower == null) {
             entityManager.getTransaction().commit();
             return null;
-        }
-            
+        }  
        user.getFollowers().remove(follower);
+       
        follower.getFollowerOf().remove(user);
+       UserProfile userP = convertToUserProfile(user);
        entityManager.getTransaction().commit();
        
-       return getUser(userEmail);
+       return userP;
     }
     
     public int addRecipe(Recipe recipe) throws Exception {
         Recipes recipes = convertToRecipesEntity(recipe);
-        int recipeID = 0;
         try {
             entityManager.getTransaction().begin();       
             entityManager.persist(recipes);
             entityManager.flush();
-            recipeID = recipes.getRecipeid();
-            addRecipeData(recipe, recipeID);
+            addRecipeData(recipe, recipes);
             entityManager.getTransaction().commit();
             
-            return recipeID;
+            return recipes.getRecipeid();
         }
         catch (Exception e) {
             throw e;
         }
     }
     
-    private void addRecipeData(Recipe recipe, int recipeID) throws Exception {
+    private void addRecipeData(Recipe recipe, Recipes recipes) throws Exception {
         
         try {
-            Recipes rec = entityManager.find(Recipes.class, recipeID);
+            int recipeID = recipes.getRecipeid();
         
             int i =1;
             for (byte[] picture : recipe.getImages()) {
                 RecipepicturesPK picPK = new RecipepicturesPK(recipeID, i);
                 Recipepictures pic = new Recipepictures(picPK);
                 pic.setPicture(picture);
-                rec.getRecipepicturesList().add(pic);
+                recipes.getRecipepicturesList().add(pic);
                 i++;
             }
          
             for (String cuisine : recipe.getCuisines()) {
                 RecipecuisinesPK cuisPK = new RecipecuisinesPK(recipeID, cuisine);
                 Recipecuisines cuis = new Recipecuisines(cuisPK);
-                rec.getRecipecuisinesList().add(cuis);
+                recipes.getRecipecuisinesList().add(cuis);
             }
         
             i = 1;
@@ -181,7 +182,7 @@ public class RecipeDbController {
                 RecipeinstructionsPK instrucPK = new RecipeinstructionsPK(recipeID ,i);
                 Recipeinstructions instruc = new Recipeinstructions(instrucPK);
                 instruc.setInstruction(instruction);
-                rec.getRecipeinstructionsList().add(instruc);
+                recipes.getRecipeinstructionsList().add(instruc);
                 i++;
             }
         
@@ -189,7 +190,7 @@ public class RecipeDbController {
                 RecipeingredientsPK ingredPK = new RecipeingredientsPK(recipeID, ingredient);
                 Recipeingredients ingred = new Recipeingredients(ingredPK);
                 ingred.setQuantity(recipe.getIngredients().get(ingredient));
-                rec.getRecipeingredientsList().add(ingred);
+                recipes.getRecipeingredientsList().add(ingred);
             }
         }
         catch (Exception e) {
@@ -236,23 +237,24 @@ public class RecipeDbController {
         Recipepictures pic = new Recipepictures(recipeID, rec.getRecipepicturesList().size() + 1);
         pic.setPicture(picture);
         rec.getRecipepicturesList().add(pic);
+        
+        Recipe recipe = convertToRecipe(rec);
         entityManager.getTransaction().commit();
         
-        return getRecipe(recipeID);
+        return recipe;
     }
     
     public RecipeList searchRecipes(String skill, String cuisines, String type, String author, String freeText) {
-        String[] cuisinesArray = null;
-        if (cuisines != null)
-            cuisinesArray = cuisines.split("\\+");
-       
-        String sqlString = "SELECT DISTINCT * FROM Recipes NATURAL JOIN Recipecuisines";
+        String[] cuisinesArray = cuisines.split("\\+");
+        
+        String recipeColumnNames = "recipeID, name, description, type, author, skillLevel, releaseDate";
+        String sqlString = "SELECT DISTINCT " + recipeColumnNames + " FROM Recipes NATURAL JOIN Recipecuisines";
         
         if (!skill.equals("null") || !cuisines.equals("null") || !type.equals("null") || !author.equals("null"))
             sqlString += " WHERE";
        
         if (!skill.equals("null")) {
-            sqlString += " skilllevel = '" + skill + "'";
+            sqlString += " skillLevel = '" + skill + "'";
         }
         if (!cuisines.equals("null")) {
             if (!skill.equals("null"))
@@ -273,6 +275,7 @@ public class RecipeDbController {
                 sqlString += " AND";
             sqlString += " author = '" + author + "'";
         }
+        sqlString += " ORDER BY releaseDate DESC";
         
         Query searchRecipes;
         try {
@@ -301,21 +304,7 @@ public class RecipeDbController {
             }
         }
         
-        results = removeDuplicates(results);
-        return (new RecipeList(results)).sortByDate();
-    }
-    
-    private static ArrayList<Recipe> removeDuplicates(ArrayList<Recipe> recipes) {
-        ArrayList<Recipe> result = new ArrayList<>();
-        for (int i = 0; i < recipes.size(); i++) {
-            for (int j = i + 1; j < recipes.size(); j++) {
-              if (recipes.get(i).getRecipeId() == recipes.get(j).getRecipeId())
-                  recipes.get(j).setRecipeId(-1);
-            }
-            if (recipes.get(i).getRecipeId() != -1)
-                result.add(recipes.get(i));
-        }
-        return result;
+        return new RecipeList(results);
     }
     
     public RecipeList getUsersRecipes(String email) {
@@ -361,11 +350,6 @@ public class RecipeDbController {
      */
     private UserProfile convertToUserProfile(Userprofiles user) {
         
-        // convert skillLevel string to skillLevel enum type
-        skillLevel skill = null;
-        if (user.getSkilllevel() != null)
-            skill = skillLevel.valueOf(user.getSkilllevel());
-        
         // convert Followers lists of Userprofiles to lists of email strings
         ArrayList<String> followers = new ArrayList<>();
         ArrayList<String> followerOf = new ArrayList<>();
@@ -381,7 +365,8 @@ public class RecipeDbController {
             cuisines.add(userCuisine.getUsercuisinesPK().getCuisine());
         }
         
-        return new UserProfile(user.getEmail(), user.getFirstname(), user.getLastname(), cuisines, skill, user.getCountry(), user.getProfilePic(), followers, followerOf);
+        return new UserProfile(user.getEmail(), user.getFirstname(), user.getLastname(), 
+                               cuisines, user.getSkilllevel(), user.getCountry(), user.getProfilePic(), followers, followerOf);
     }
     
      /**
@@ -395,12 +380,7 @@ public class RecipeDbController {
         userP.setLastname(user.getLastName());
         userP.setCountry(user.getCountry());
         userP.setProfilePic(user.getProfilePic());
-        
-        // convert skillLevel enum type to skillLevel string
-        String skill = null;
-        if (user.getCookingSkills() != null) 
-            skill = user.getCookingSkills().name();
-        userP.setSkilllevel(skill);
+        userP.setSkilllevel(user.getCookingSkills());
         
         // initialize empty lists of Userprofiles
         ArrayList<Userprofiles> followers = new ArrayList<>();
@@ -430,18 +410,8 @@ public class RecipeDbController {
         recipe.setReleaseDate(recipes.getReleasedate());
         recipe.setAuthor(recipes.getAuthor().getEmail());
         recipe.setDescription(recipes.getDescription());
-        
-        // convert skill level string to skillLevel enum type
-        skillLevel skill = null;
-        if (recipe.getSkillLevel() != null)
-            skill = skillLevel.valueOf(recipes.getSkilllevel());
-        recipe.setSkillLevel(skill);
-        
-        // convert recipe type string to recipeType enum type
-        recipeType type = null;
-        if (recipe.getType() != null)
-            type = recipeType.valueOf(recipes.getType());
-        recipe.setType(type);
+        recipe.setSkillLevel(recipes.getSkilllevel());
+        recipe.setType(recipes.getType());
         
         for (Recipecuisines cuisine : recipes.getRecipecuisinesList()) {
             recipe.getCuisines().add(cuisine.getRecipecuisinesPK().getCuisine());
@@ -475,18 +445,8 @@ public class RecipeDbController {
         Userprofiles author = entityManager.find(Userprofiles.class, recipe.getAuthor());
         recipes.setAuthor(author);
         recipes.setDescription(recipe.getDescription());
-        
-        // convert skillLevel enum type to skill level string
-        String skill = null;
-        if (recipe.getSkillLevel() != null)
-            skill = recipe.getSkillLevel().name();
-        recipes.setSkilllevel(skill);
-        
-        // convert recipeType enum type to recipe type string
-        String type = null;
-        if (recipe.getType() != null)
-            type = recipe.getType().name();
-        recipes.setType(type);
+        recipes.setSkilllevel(recipe.getSkillLevel());
+        recipes.setType(recipe.getType());
         
         ArrayList<Recipecuisines> cuisines = new ArrayList<>();
         recipes.setRecipecuisinesList(cuisines);

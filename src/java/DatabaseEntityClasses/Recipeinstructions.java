@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DatabaseEntityClasses;
 
 import java.io.Serializable;
@@ -11,11 +7,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -23,12 +15,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "RECIPEINSTRUCTIONS")
-@XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Recipeinstructions.findAll", query = "SELECT r FROM Recipeinstructions r")
-    , @NamedQuery(name = "Recipeinstructions.findByRecipeid", query = "SELECT r FROM Recipeinstructions r WHERE r.recipeinstructionsPK.recipeid = :recipeid")
-    , @NamedQuery(name = "Recipeinstructions.findByInstructionnum", query = "SELECT r FROM Recipeinstructions r WHERE r.recipeinstructionsPK.instructionnum = :instructionnum")
-    , @NamedQuery(name = "Recipeinstructions.findByInstruction", query = "SELECT r FROM Recipeinstructions r WHERE r.instruction = :instruction")})
 public class Recipeinstructions implements Serializable {
 
     private static final long serialVersionUID = 1L;

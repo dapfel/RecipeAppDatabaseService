@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DatabaseEntityClasses;
 
 import java.io.Serializable;
@@ -15,12 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import DatabaseAccess.UserProfile.skillLevel;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.validation.constraints.Pattern;
 
 /**
  *
@@ -28,15 +24,6 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "USERPROFILES")
-@XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Userprofiles.findAll", query = "SELECT u FROM Userprofiles u")
-    , @NamedQuery(name = "Userprofiles.findByEmail", query = "SELECT u FROM Userprofiles u WHERE u.email = :email")
-    , @NamedQuery(name = "Userprofiles.findByPassword", query = "SELECT u FROM Userprofiles u WHERE u.password = :password")
-    , @NamedQuery(name = "Userprofiles.findByFirstname", query = "SELECT u FROM Userprofiles u WHERE u.firstname = :firstname")
-    , @NamedQuery(name = "Userprofiles.findByLastname", query = "SELECT u FROM Userprofiles u WHERE u.lastname = :lastname")
-    , @NamedQuery(name = "Userprofiles.findByCountry", query = "SELECT u FROM Userprofiles u WHERE u.country = :country")
-    , @NamedQuery(name = "Userprofiles.findBySkilllevel", query = "SELECT u FROM Userprofiles u WHERE u.skilllevel = :skilllevel")})
 public class Userprofiles implements Serializable {
 
     @OneToMany(mappedBy = "commentauthor")
@@ -45,6 +32,7 @@ public class Userprofiles implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
+    @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")
     @Column(name = "EMAIL")
     private String email;
     @Column(name = "PASSWORD")
@@ -55,8 +43,9 @@ public class Userprofiles implements Serializable {
     private String lastname;
     @Column(name = "COUNTRY")
     private String country;
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "SKILLLEVEL")
-    private String skilllevel;
+    private skillLevel skilllevel;
     @Column(name = "PROFILEPIC")
     private byte[] profilePic;
     @JoinTable(name = "FOLLOWS", joinColumns = {
@@ -69,7 +58,7 @@ public class Userprofiles implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userprofiles")
     private List<Usercuisines> usercuisinesList;
     @OneToMany(mappedBy = "author")
-    private List<Recipes> recipesList;
+    private List<Recipes> recipesList;  
 
     public Userprofiles() {
     }
@@ -118,11 +107,11 @@ public class Userprofiles implements Serializable {
         this.country = country;
     }
 
-    public String getSkilllevel() {
+    public skillLevel getSkilllevel() {
         return skilllevel;
     }
 
-    public void setSkilllevel(String skilllevel) {
+    public void setSkilllevel(skillLevel skilllevel) {
         this.skilllevel = skilllevel;
     }
 
@@ -134,7 +123,6 @@ public class Userprofiles implements Serializable {
         this.profilePic = profilePic;
     }
 
-    @XmlTransient
     public List<Userprofiles> getFollowers() {
         return followers;
     }
@@ -143,7 +131,6 @@ public class Userprofiles implements Serializable {
         this.followers = followers;
     }
 
-    @XmlTransient
     public List<Userprofiles> getFollowerOf() {
         return followerOf;
     }
@@ -152,7 +139,6 @@ public class Userprofiles implements Serializable {
         this.followerOf = followerOf;
     }
 
-    @XmlTransient
     public List<Usercuisines> getUsercuisinesList() {
         return usercuisinesList;
     }
@@ -161,7 +147,6 @@ public class Userprofiles implements Serializable {
         this.usercuisinesList = usercuisinesList;
     }
 
-    @XmlTransient
     public List<Recipes> getRecipesList() {
         return recipesList;
     }
@@ -195,7 +180,6 @@ public class Userprofiles implements Serializable {
         return "DatabaseEntityClasses.Userprofiles[ email=" + email + " ]";
     }
 
-    @XmlTransient
     public List<Recipecomments> getRecipecommentsList() {
         return recipecommentsList;
     }
