@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.persistence.Query;
 import DatabaseAccess.UserProfile.skillLevel;
+import DatabaseAccess.Recipe.recipeType;
 
 public class RecipeDbController {
     
@@ -254,7 +255,8 @@ public class RecipeDbController {
             sqlString += " WHERE";
        
         if (!skill.equals("null")) {
-            sqlString += " skillLevel = '" + skill + "'";
+            int skillNum = skillLevel.valueOf(skill).ordinal();
+            sqlString += " skillLevel = '" + skillNum + "'";
         }
         if (!cuisines.equals("null")) {
             if (!skill.equals("null"))
@@ -266,9 +268,10 @@ public class RecipeDbController {
                     sqlString += " cuisine = '" + cuisinesArray[i] +"'" + " OR";
         }
         if (!type.equals("null")) {
+            int typeNum = recipeType.valueOf(type).ordinal();
             if (!cuisines.equals("null") || !skill.equals("null"))
                 sqlString += " AND";
-            sqlString += " type = '" + type + "'";
+            sqlString += " type = '" + typeNum + "'";
         }
         if (!author.equals("null")) {
             if (!type.equals("null") || !cuisines.equals("null") || !skill.equals("null"))
