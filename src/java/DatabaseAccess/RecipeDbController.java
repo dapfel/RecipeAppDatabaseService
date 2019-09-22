@@ -147,8 +147,9 @@ public class RecipeDbController {
         try {
             entityManager.getTransaction().begin();       
             entityManager.persist(recipes);
-            entityManager.flush();
-            addRecipeData(recipe, recipes);
+            // need to flush before adding additional recipe data in order to get the auto-generated recipeID needed.
+            entityManager.flush(); 
+            addRecipeData(recipe, recipes); 
             entityManager.getTransaction().commit();
             
             return recipes.getRecipeid();

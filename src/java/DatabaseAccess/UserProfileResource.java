@@ -79,10 +79,10 @@ public class UserProfileResource {
     @POST
     @Path("changeProfilePic/{userEmail}")
     public String changeProfilePic(String picJson, @PathParam("userEmail") String userEmail) {
-        ProfilePic pic = new Gson().fromJson(picJson, ProfilePic.class);
+        byte[] pic = new Gson().fromJson(picJson, byte[].class);
         UserProfile user = null;
         try {
-            user = recipeDB.changeProfilePic(userEmail, pic.getPicture());
+            user = recipeDB.changeProfilePic(userEmail, pic);
         }
         catch (Exception e) {
             user = null;
