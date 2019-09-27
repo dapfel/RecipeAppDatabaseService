@@ -7,6 +7,7 @@ import DatabaseEntityClasses.*;
 import java.util.List;
 import java.util.ArrayList;
 import javax.persistence.Query;
+import javax.persistence.LockModeType;
 import DatabaseAccess.UserProfile.skillLevel;
 import DatabaseAccess.Recipe.recipeType;
 
@@ -63,7 +64,7 @@ public class RecipeDbController {
     
     public UserProfile changeProfilePic(String userEmail, byte[] pic) {
         entityManager.getTransaction().begin();
-        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail,LockModeType.PESSIMISTIC_WRITE);
         if (user == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -79,7 +80,7 @@ public class RecipeDbController {
         public UserProfile updateUserProfile(String userEmail, String newPassword, String newFirstName, 
                                              String newLastName, String newCountry, String newCuisines, String newSkillLevel) {
         entityManager.getTransaction().begin();
-        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail, LockModeType.PESSIMISTIC_WRITE);
         if (user == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -111,8 +112,8 @@ public class RecipeDbController {
     
     public UserProfile addFollower(String userEmail, String followerEmail) {
         entityManager.getTransaction().begin();
-        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
-        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail, LockModeType.PESSIMISTIC_WRITE);
+        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail, LockModeType.PESSIMISTIC_WRITE);
         if (user == null || follower == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -127,8 +128,8 @@ public class RecipeDbController {
     
     public UserProfile deleteFollower(String userEmail, String followerEmail) {
         entityManager.getTransaction().begin();
-        Userprofiles user = entityManager.find(Userprofiles.class, userEmail);
-        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail);
+        Userprofiles user = entityManager.find(Userprofiles.class, userEmail, LockModeType.PESSIMISTIC_WRITE);
+        Userprofiles follower = entityManager.find(Userprofiles.class, followerEmail, LockModeType.PESSIMISTIC_WRITE);
         if (user == null || follower == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -210,7 +211,7 @@ public class RecipeDbController {
     
     public Recipe addComment(int recipeID, Comment comment) {  
         entityManager.getTransaction().begin();        
-        Recipes rec = entityManager.find(Recipes.class, recipeID);
+        Recipes rec = entityManager.find(Recipes.class, recipeID, LockModeType.PESSIMISTIC_WRITE);
         if (rec == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -230,7 +231,7 @@ public class RecipeDbController {
   
     public Recipe addPicture(int recipeID, byte[] picture) throws Exception {
         entityManager.getTransaction().begin();        
-        Recipes rec = entityManager.find(Recipes.class, recipeID);
+        Recipes rec = entityManager.find(Recipes.class, recipeID, LockModeType.PESSIMISTIC_WRITE);
         if (rec == null) {
             entityManager.getTransaction().commit();
             return null;
@@ -291,7 +292,7 @@ public class RecipeDbController {
                 
         List<Recipes> resultList;
         resultList = searchRecipes.getResultList(); 
-        
+                            
         ArrayList<Recipe> results = new ArrayList<>();
         // only adds to results those recipes that contain the user inputed keywords (freeText) in their name or description
         if (!freeText.equals("null")) { 
